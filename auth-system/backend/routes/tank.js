@@ -59,12 +59,12 @@ router.get('/dashboard', auth, async (req, res) => {
 
     // Calculate averages
     const averages = tankData.length > 0 ? {
-      ph: tankData.reduce((sum, record) => sum + record.ph, 0) / tankData.length,
-      temperature: tankData.reduce((sum, record) => sum + record.temperature, 0) / tankData.length,
-      oxygenation: tankData.reduce((sum, record) => sum + record.oxygenation, 0) / tankData.length,
-      nitrite: tankData.reduce((sum, record) => sum + record.nitrite, 0) / tankData.length,
-      ammonia: tankData.reduce((sum, record) => sum + record.ammonia, 0) / tankData.length
-    } : { ph: 0, temperature: 0, oxygenation: 0, nitrite: 0, ammonia: 0 };
+      ph: (tankData.reduce((sum, record) => sum + record.ph, 0) / tankData.length).toFixed(1),
+      temperature: (tankData.reduce((sum, record) => sum + record.temperature, 0) / tankData.length).toFixed(1),
+      oxygenation: (tankData.reduce((sum, record) => sum + record.oxygenation, 0) / tankData.length).toFixed(1),
+      nitrite: (tankData.reduce((sum, record) => sum + record.nitrite, 0) / tankData.length).toFixed(2),
+      ammonia: (tankData.reduce((sum, record) => sum + record.ammonia, 0) / tankData.length).toFixed(2)
+    } : { ph: '0.0', temperature: '0.0', oxygenation: '0.0', nitrite: '0.00', ammonia: '0.00' };
 
     res.json({
       chartData: tankData,

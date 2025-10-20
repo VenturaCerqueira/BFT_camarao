@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const TankRegistration = () => {
+  const [tanks, setTanks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingTank, setEditingTank] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     capacity: '',
@@ -14,9 +20,56 @@ const TankRegistration = () => {
     status: 'Ativo',
     notes: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchTanks();
+  }, []);
+
+  const fetchTanks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/tanks', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTanks(response.data.tanks);
+    } catch (error) {
+      console.error('Error fetching tanks:', error);
+    } finally {
+      setFetchLoading(false);
+    }
+  };
+
+  const handleEdit = (tank) => {
+    setEditingTank(tank);
+    setFormData({
+      name: tank.name,
+      capacity: tank.capacity,
+      size: tank.size,
+      installationDate: tank.installationDate.split('T')[0],
+      expiryDate: tank.expiryDate.split('T')[0],
+      feedingType: tank.feedingType,
+      technicalResponsible: tank.technicalResponsible,
+      status: tank.status,
+      notes: tank.notes
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (tankId) => {
+    if (!window.confirm('Tem certeza que deseja excluir este tanque?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/tanks/${tankId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMessage('Tanque excluído com sucesso!');
+      fetchTanks();
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Erro ao excluir tanque');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,11 +78,23 @@ const TankRegistration = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/tanks', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
 
-      setMessage('Tanque cadastrado com sucesso!');
+      if (editingTank) {
+        // Update existing tank
+        await axios.put(`http://localhost:5000/api/tanks/${editingTank._id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMessage('Tanque atualizado com sucesso!');
+        setEditingTank(null);
+        setShowForm(false);
+      } else {
+        // Create new tank
+        await axios.post('http://localhost:5000/api/tanks', formData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMessage('Tanque cadastrado com sucesso!');
+      }
+
       setFormData({
         name: '',
         capacity: '',
@@ -41,8 +106,9 @@ const TankRegistration = () => {
         status: 'Ativo',
         notes: ''
       });
+      fetchTanks();
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Erro ao cadastrar tanque');
+      setMessage(error.response?.data?.message || 'Erro ao salvar tanque');
     } finally {
       setLoading(false);
     }
@@ -119,9 +185,18 @@ const TankRegistration = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto space-y-8">
+            {/* Tank List */}
             <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Cadastrar Tanque</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Tanques Cadastrados</h2>
+                <button
+                  onClick={() => setShowForm(!showForm)}
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                >
+                  {showForm ? 'Cancelar' : 'Cadastrar Tanque'}
+                </button>
+              </div>
 
               {message && (
                 <div className={`mb-4 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -129,9 +204,74 @@ const TankRegistration = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+              {fetchLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Carregando tanques...</p>
+                </div>
+              ) : tanks.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Nenhum tanque cadastrado ainda.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidade</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {tanks.map((tank) => (
+                        <tr key={tank._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tank.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tank.capacity} L</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              tank.status === 'Ativo' ? 'bg-green-100 text-green-800' :
+                              tank.status === 'Manutenção' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {tank.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tank.technicalResponsible}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button
+                              onClick={() => handleEdit(tank)}
+                              className="text-indigo-600 hover:text-indigo-900 mr-4"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => handleDelete(tank._id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Excluir
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Form */}
+            {showForm && (
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  {editingTank ? 'Editar Tanque' : 'Cadastrar Tanque'}
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Tanque *</label>
                     <input
                       type="text"
@@ -250,24 +390,46 @@ const TankRegistration = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                     placeholder="Observações adicionais (opcional)"
-                  />
+                  ></textarea>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditingTank(null);
+                      setFormData({
+                        name: '',
+                        capacity: '',
+                        size: '',
+                        installationDate: '',
+                        expiryDate: '',
+                        feedingType: 'Natural',
+                        technicalResponsible: '',
+                        status: 'Ativo',
+                        notes: ''
+                      });
+                    }}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                  >
+                    Cancelar
+                  </button>
                   <button
                     type="submit"
                     disabled={loading}
                     className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Cadastrando...' : 'Cadastrar Tanque'}
+                    {loading ? (editingTank ? 'Atualizando...' : 'Cadastrando...') : (editingTank ? 'Atualizar Tanque' : 'Cadastrar Tanque')}
                   </button>
                 </div>
               </form>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
+  </div>  
   );
 };
 

@@ -119,14 +119,6 @@ const Dashboard = () => {
       notes: 'Dados gerados em tempo real'
     });
 
-    setAverages({
-      ph: randomPh,
-      temperature: randomTemp,
-      oxygenation: randomOxygenation,
-      nitrite: randomNitrite,
-      ammonia: randomAmmonia
-    });
-
     // Update active tanks with random data
     setActiveTanks(prevTanks => prevTanks.map(tank => ({
       ...tank,
@@ -296,23 +288,23 @@ const Dashboard = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Médias (Últimos 30 dias)</h3>
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{averages.ph?.toFixed(1) || '0.0'}</div>
+                    <div className="text-2xl font-bold text-blue-600">{averages.ph || '0.0'}</div>
                     <div className="text-sm text-gray-500">pH Médio</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{averages.temperature?.toFixed(1) || '0.0'}°C</div>
+                    <div className="text-2xl font-bold text-red-600">{averages.temperature || '0.0'}°C</div>
                     <div className="text-sm text-gray-500">Temperatura Média</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{averages.oxygenation?.toFixed(1) || '0.0'} mg/L</div>
+                    <div className="text-2xl font-bold text-green-600">{averages.oxygenation || '0.0'} mg/L</div>
                     <div className="text-sm text-gray-500">Oxigenação Média</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{averages.nitrite?.toFixed(1) || '0.0'} mg/L</div>
+                    <div className="text-2xl font-bold text-yellow-600">{averages.nitrite || '0.0'} mg/L</div>
                     <div className="text-sm text-gray-500">Nitrito Médio</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{averages.ammonia?.toFixed(1) || '0.0'} mg/L</div>
+                    <div className="text-2xl font-bold text-purple-600">{averages.ammonia || '0.0'} mg/L</div>
                     <div className="text-sm text-gray-500">Amônia Média</div>
                   </div>
                 </div>

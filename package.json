@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "mongodb-memory-server": "^10.2.3",
     "recharts": "^3.3.0"
   }

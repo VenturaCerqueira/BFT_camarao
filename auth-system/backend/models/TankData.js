@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const tankDataSchema = new mongoose.Schema({
+  tankId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tank',
+    required: true
+  },
   ph: {
     type: Number,
     required: true,
@@ -27,6 +32,35 @@ const tankDataSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
+  },
+  salinity: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  nitrate: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  alkalinity: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  turbidity: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  orp: {
+    type: Number,
+    default: 0
+  },
+  co2: {
+    type: Number,
+    min: 0,
+    default: 0
   },
   inspectionDate: {
     type: Date,

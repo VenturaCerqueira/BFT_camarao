@@ -7,9 +7,14 @@ const router = express.Router();
 // Get all tank data for the authenticated user
 router.get('/', auth, async (req, res) => {
   try {
-    const { page = 1, limit = 10, startDate, endDate } = req.query;
+    const { page = 1, limit = 10, startDate, endDate, tankId } = req.query;
 
     let query = { createdBy: req.user.userId };
+
+    // Add tankId filter if provided
+    if (tankId) {
+      query.tankId = tankId;
+    }
 
     // Add date range filter if provided
     if (startDate || endDate) {
@@ -22,7 +27,8 @@ router.get('/', auth, async (req, res) => {
       .sort({ inspectionDate: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .populate('createdBy', 'username');
+      .populate('createdBy', 'username')
+      .populate('tankId', 'name');
 
     const total = await TankData.countDocuments(query);
 
@@ -66,11 +72,44 @@ router.get('/dashboard', auth, async (req, res) => {
       ammonia: (tankData.reduce((sum, record) => sum + record.ammonia, 0) / tankData.length).toFixed(2)
     } : { ph: '0.0', temperature: '0.0', oxygenation: '0.0', nitrite: '0.00', ammonia: '0.00' };
 
+    // Get active tanks with their latest data
+    const Tank = require('../models/Tank');
+    const activeTanks = await Tank.find({
+      createdBy: req.user.userId,
+      status: 'Ativo'
+    }).select('name');
+
+    const tanksWithData = await Promise.all(activeTanks.map(async (tank) => {
+      const latestData = await TankData.findOne({
+        tankId: tank._id,
+        createdBy: req.user.userId
+      })
+        .sort({ inspectionDate: -1 })
+        .select('ph temperature oxygenation nitrite ammonia salinity nitrate alkalinity turbidity orp co2');
+
+      return {
+        id: tank._id,
+        name: tank.name,
+        ph: latestData ? latestData.ph.toString() : '0.0',
+        temperature: latestData ? latestData.temperature.toString() : '0.0',
+        oxygenation: latestData ? latestData.oxygenation.toString() : '0.0',
+        nitrite: latestData ? latestData.nitrite.toString() : '0.00',
+        ammonia: latestData ? latestData.ammonia.toString() : '0.00',
+        salinity: latestData ? latestData.salinity.toString() : '0.0',
+        nitrate: latestData ? latestData.nitrate.toString() : '0.0',
+        alkalinity: latestData ? latestData.alkalinity.toString() : '0.0',
+        turbidity: latestData ? latestData.turbidity.toString() : '0.0',
+        orp: latestData ? latestData.orp.toString() : '0.0',
+        co2: latestData ? latestData.co2.toString() : '0.0'
+      };
+    }));
+
     res.json({
       chartData: tankData,
       latestRecord,
       averages,
-      totalRecords: tankData.length
+      totalRecords: tankData.length,
+      activeTanks: tanksWithData
     });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar dados do dashboard' });
@@ -80,11 +119,17 @@ router.get('/dashboard', auth, async (req, res) => {
 // Create new tank data
 router.post('/', auth, async (req, res) => {
   try {
-    const { ph, temperature, oxygenation, nitrite, ammonia, inspectionDate, feedingDate, responsible, notes } = req.body;
+    const { tankId, ph, temperature, oxygenation, nitrite, ammonia, salinity, nitrate, alkalinity, turbidity, orp, co2, inspectionDate, feedingDate, responsible, notes } = req.body;
 
     // Validate required fields
-    if (!ph || !temperature || !oxygenation || !nitrite || !ammonia || !inspectionDate || !feedingDate || !responsible) {
+    if (!tankId || !ph || !temperature || !oxygenation || !nitrite || !ammonia || !inspectionDate || !feedingDate || !responsible) {
       return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
+    }
+
+    // Validate tank exists and belongs to user
+    const tank = await require('../models/Tank').findOne({ _id: tankId, createdBy: req.user.userId });
+    if (!tank) {
+      return res.status(404).json({ message: 'Tanque não encontrado' });
     }
 
     // Validate ranges
@@ -109,11 +154,18 @@ router.post('/', auth, async (req, res) => {
     }
 
     const tankData = new TankData({
+      tankId,
       ph: parseFloat(ph),
       temperature: parseFloat(temperature),
       oxygenation: parseFloat(oxygenation),
       nitrite: parseFloat(nitrite),
       ammonia: parseFloat(ammonia),
+      salinity: parseFloat(salinity || 0),
+      nitrate: parseFloat(nitrate || 0),
+      alkalinity: parseFloat(alkalinity || 0),
+      turbidity: parseFloat(turbidity || 0),
+      orp: parseFloat(orp || 0),
+      co2: parseFloat(co2 || 0),
       inspectionDate: new Date(inspectionDate),
       feedingDate: new Date(feedingDate),
       responsible: responsible.trim(),

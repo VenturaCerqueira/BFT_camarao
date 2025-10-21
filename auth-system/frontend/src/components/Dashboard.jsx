@@ -13,6 +13,14 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import {
+  CogIcon,
+  XMarkIcon,
+  CheckIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
+  EyeIcon
+} from '@heroicons/react/24/outline';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -25,6 +33,51 @@ const Dashboard = () => {
   const [productionData, setProductionData] = useState({});
   const [technologicalData, setTechnologicalData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showWaterControlModal, setShowWaterControlModal] = useState(false);
+  const [showWaterQualityModal, setShowWaterQualityModal] = useState(false);
+  const [showFullWaterQualityModal, setShowFullWaterQualityModal] = useState(false);
+  const [selectedTank, setSelectedTank] = useState(null);
+  const [tanks, setTanks] = useState([]);
+  const [waterQualityFormData, setWaterQualityFormData] = useState({
+    tankId: '',
+    ph: '',
+    temperature: '',
+    oxygenation: '',
+    salinity: '',
+    ammonia: '',
+    nitrite: '',
+    nitrate: '',
+    alkalinity: '',
+    turbidity: '',
+    orp: '',
+    co2: '',
+    inspectionDate: new Date().toISOString().split('T')[0],
+    feedingDate: new Date().toISOString().split('T')[0],
+    responsible: '',
+    notes: ''
+  });
+  const [fullWaterQualityFormData, setFullWaterQualityFormData] = useState({
+    tankId: '',
+    ph: '',
+    temperature: '',
+    oxygenation: '',
+    salinity: '',
+    ammonia: '',
+    nitrite: '',
+    nitrate: '',
+    alkalinity: '',
+    turbidity: '',
+    orp: '',
+    co2: '',
+    inspectionDate: new Date().toISOString().split('T')[0],
+    feedingDate: new Date().toISOString().split('T')[0],
+    responsible: '',
+    notes: ''
+  });
+  const [waterQualityLoading, setWaterQualityLoading] = useState(false);
+  const [waterQualityMessage, setWaterQualityMessage] = useState('');
+  const [fullWaterQualityLoading, setFullWaterQualityLoading] = useState(false);
+  const [fullWaterQualityMessage, setFullWaterQualityMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,24 +88,6 @@ const Dashboard = () => {
     }
 
     fetchData();
-    // Initialize comprehensive shrimp farming data
-    setActiveTanks([
-      {
-        name: 'Tanque 01',
-        ph: '7.2', temperature: '28.5', oxygenation: '6.8', nitrite: '0.12', ammonia: '0.05',
-        salinity: '15.2', nitrate: '2.1', alkalinity: '120', turbidity: '8.5', orp: '320', co2: '12.5'
-      },
-      {
-        name: 'Tanque 02',
-        ph: '7.4', temperature: '29.1', oxygenation: '7.2', nitrite: '0.08', ammonia: '0.03',
-        salinity: '14.8', nitrate: '1.8', alkalinity: '135', turbidity: '7.2', orp: '345', co2: '10.8'
-      },
-      {
-        name: 'Tanque 03',
-        ph: '7.1', temperature: '27.8', oxygenation: '6.5', nitrite: '0.15', ammonia: '0.07',
-        salinity: '16.1', nitrate: '2.5', alkalinity: '110', turbidity: '9.8', orp: '298', co2: '14.2'
-      }
-    ]);
 
     // Initialize biological data
     setBiologicalData({
@@ -148,6 +183,14 @@ const Dashboard = () => {
       setTankData(tankResponse.data.chartData || []);
       setLatestRecord(tankResponse.data.latestRecord);
       setAverages(tankResponse.data.averages || {});
+      setActiveTanks(tankResponse.data.activeTanks || []);
+
+      // Get shrimp biological data for dashboard
+      const shrimpResponse = await axios.get('http://localhost:5000/api/shrimp/dashboard', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setBiologicalData(shrimpResponse.data);
     } catch (error) {
       console.error('Error fetching data:', error);
       if (error.response?.status === 401) {
@@ -162,6 +205,96 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const handleWaterQualityChange = (e) => {
+    setWaterQualityFormData({
+      ...waterQualityFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleWaterQualitySubmit = async (e) => {
+    e.preventDefault();
+    setWaterQualityLoading(true);
+    setWaterQualityMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/tank', waterQualityFormData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setWaterQualityMessage('Dados cadastrados com sucesso!');
+      setWaterQualityFormData({
+        tankId: '',
+        ph: '',
+        temperature: '',
+        oxygenation: '',
+        salinity: '',
+        ammonia: '',
+        nitrite: '',
+        nitrate: '',
+        alkalinity: '',
+        turbidity: '',
+        orp: '',
+        co2: '',
+        inspectionDate: new Date().toISOString().split('T')[0],
+        feedingDate: new Date().toISOString().split('T')[0],
+        responsible: '',
+        notes: ''
+      });
+      fetchData(); // Refresh data
+    } catch (error) {
+      setWaterQualityMessage(error.response?.data?.message || 'Erro ao cadastrar dados');
+    } finally {
+      setWaterQualityLoading(false);
+    }
+  };
+
+  const handleFullWaterQualityChange = (e) => {
+    setFullWaterQualityFormData({
+      ...fullWaterQualityFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFullWaterQualitySubmit = async (e) => {
+    e.preventDefault();
+    setFullWaterQualityLoading(true);
+    setFullWaterQualityMessage('');
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/tank', fullWaterQualityFormData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setFullWaterQualityMessage('Dados cadastrados com sucesso!');
+      setFullWaterQualityFormData({
+        tankId: '',
+        ph: '',
+        temperature: '',
+        oxygenation: '',
+        salinity: '',
+        ammonia: '',
+        nitrite: '',
+        nitrate: '',
+        alkalinity: '',
+        turbidity: '',
+        orp: '',
+        co2: '',
+        inspectionDate: new Date().toISOString().split('T')[0],
+        feedingDate: new Date().toISOString().split('T')[0],
+        responsible: '',
+        notes: ''
+      });
+      fetchData(); // Refresh data
+    } catch (error) {
+      setFullWaterQualityMessage(error.response?.data?.message || 'Erro ao cadastrar dados');
+    } finally {
+      setFullWaterQualityLoading(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -230,6 +363,24 @@ const Dashboard = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Cadastrar Tanque
+              </a>
+              <a
+                href="/water-quality-registration"
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Qualidade da Água
+              </a>
+              <a
+                href="/shrimp-registration"
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
+              >
+                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Cadastrar Camarão
               </a>
             </nav>
           </div>
@@ -384,12 +535,40 @@ const Dashboard = () => {
                     <p className="text-gray-500 text-center py-8">Nenhum tanque ativo encontrado.</p>
                   ) : (
                     activeTanks.map((tank, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                      <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                         <div className="flex justify-between items-center mb-3">
-                          <h4 className="text-md font-semibold text-gray-900">{tank.name || `Tanque ${index + 1}`}</h4>
-                          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                            Ativo
-                          </span>
+                          <div className="flex items-center">
+                            <svg className="w-5 h-5 text-blue-500 mr-2 animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 2L3 9h4v9h6V9h4L10 2z" clipRule="evenodd" />
+                            </svg>
+                            <h4 className="text-md font-semibold text-gray-900">{tank.name || `Tanque ${index + 1}`}</h4>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => {
+                                setSelectedTank(tank);
+                                setShowWaterControlModal(true);
+                              }}
+                              className="flex items-center px-3 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors"
+                            >
+                              <CogIcon className="w-3 h-3 mr-1" />
+                              Controle da Água
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedTank(tank);
+                                setWaterQualityFormData(prev => ({ ...prev, tankId: tank._id }));
+                                setShowWaterQualityModal(true);
+                              }}
+                              className="flex items-center px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full hover:bg-green-200 transition-colors ml-2"
+                            >
+                              <EyeIcon className="w-3 h-3 mr-1" />
+                              Cadastrar Qualidade
+                            </button>
+                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full animate-pulse">
+                              Ativo
+                            </span>
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                           <div className="text-center">
@@ -586,6 +765,680 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Water Control Modal */}
+      {showWaterControlModal && selectedTank && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Controle da Água - {selectedTank.name || `Tanque ${activeTanks.indexOf(selectedTank) + 1}`}
+                </h3>
+                <button
+                  onClick={() => setShowWaterControlModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Current Parameters */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Parâmetros Atuais</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-600">{selectedTank.ph}</div>
+                      <div className="text-sm text-gray-500">pH</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-red-600">{selectedTank.temperature}°C</div>
+                      <div className="text-sm text-gray-500">Temperatura</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">{selectedTank.oxygenation} mg/L</div>
+                      <div className="text-sm text-gray-500">Oxigenação</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-yellow-600">{selectedTank.nitrite} mg/L</div>
+                      <div className="text-sm text-gray-500">Nitrito</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Water Exchange Controls */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Troca de Água</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Percentual de Troca (%)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="5"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ex: 20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Volume (L)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Ex: 1000"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                      Executar Troca de Água
+                    </button>
+                  </div>
+                </div>
+
+                {/* Chemical Adjustments */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Ajustes Químicos</h4>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Cal (kg)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ex: 5.0"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Melaço (L)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ex: 2.0"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Probiótico (g)</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ex: 10.0"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Outros Insumos</label>
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ex: Cloro 1L"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                      Aplicar Ajustes Químicos
+                    </button>
+                  </div>
+                </div>
+
+                {/* Equipment Control */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Controle de Equipamentos</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Aeradores</span>
+                      <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                        Ligar
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Bombas de Circulação</span>
+                      <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                        Ligar
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Sistema de Filtragem</span>
+                      <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                        Ligar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Observações</h4>
+                  <textarea
+                    rows="3"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Anotações sobre os ajustes realizados..."
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowWaterControlModal(false)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg transition-colors">
+                    Salvar Alterações
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Water Quality Registration Modal */}
+      {showWaterQualityModal && selectedTank && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-2/3 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Cadastrar Qualidade da Água - {selectedTank.name || `Tanque ${activeTanks.indexOf(selectedTank) + 1}`}
+                </h3>
+                <button
+                  onClick={() => setShowWaterQualityModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              {waterQualityMessage && (
+                <div className={`mb-4 p-4 rounded-lg ${waterQualityMessage.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                  {waterQualityMessage}
+                </div>
+              )}
+
+              <form onSubmit={handleWaterQualitySubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">pH</label>
+                    <input
+                      type="number"
+                      name="ph"
+                      step="0.1"
+                      min="0"
+                      max="14"
+                      required
+                      value={waterQualityFormData.ph}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Temperatura (°C)</label>
+                    <input
+                      type="number"
+                      name="temperature"
+                      step="0.1"
+                      min="0"
+                      max="50"
+                      required
+                      value={waterQualityFormData.temperature}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Oxigenação (mg/L)</label>
+                    <input
+                      type="number"
+                      name="oxygenation"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={waterQualityFormData.oxygenation}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Salinidade (ppt)</label>
+                    <input
+                      type="number"
+                      name="salinity"
+                      step="0.1"
+                      min="0"
+                      value={waterQualityFormData.salinity}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Amônia (mg/L)</label>
+                    <input
+                      type="number"
+                      name="ammonia"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={waterQualityFormData.ammonia}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nitrito (mg/L)</label>
+                    <input
+                      type="number"
+                      name="nitrite"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={waterQualityFormData.nitrite}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nitrato (mg/L)</label>
+                    <input
+                      type="number"
+                      name="nitrate"
+                      step="0.1"
+                      min="0"
+                      value={waterQualityFormData.nitrate}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Alcalinidade (mg/L)</label>
+                    <input
+                      type="number"
+                      name="alkalinity"
+                      step="0.1"
+                      min="0"
+                      value={waterQualityFormData.alkalinity}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Turbidez (NTU)</label>
+                    <input
+                      type="number"
+                      name="turbidity"
+                      step="0.1"
+                      min="0"
+                      value={waterQualityFormData.turbidity}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ORP (mV)</label>
+                    <input
+                      type="number"
+                      name="orp"
+                      step="1"
+                      value={waterQualityFormData.orp}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">CO₂ (mg/L)</label>
+                    <input
+                      type="number"
+                      name="co2"
+                      step="0.1"
+                      min="0"
+                      value={waterQualityFormData.co2}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data da Vistoria</label>
+                    <input
+                      type="date"
+                      name="inspectionDate"
+                      required
+                      value={waterQualityFormData.inspectionDate}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data da Alimentação</label>
+                    <input
+                      type="date"
+                      name="feedingDate"
+                      required
+                      value={waterQualityFormData.feedingDate}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+                    <input
+                      type="text"
+                      name="responsible"
+                      required
+                      value={waterQualityFormData.responsible}
+                      onChange={handleWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                  <textarea
+                    name="notes"
+                    rows="3"
+                    value={waterQualityFormData.notes}
+                    onChange={handleWaterQualityChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                    placeholder="Observações adicionais (opcional)"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowWaterQualityModal(false)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={waterQualityLoading}
+                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {waterQualityLoading ? 'Salvando...' : 'Salvar Dados'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Water Quality Registration Modal */}
+      {showFullWaterQualityModal && selectedTank && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-2/3 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Cadastrar Qualidade da Água Completa - {selectedTank.name || `Tanque ${activeTanks.indexOf(selectedTank) + 1}`}
+                </h3>
+                <button
+                  onClick={() => setShowFullWaterQualityModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              {fullWaterQualityMessage && (
+                <div className={`mb-4 p-4 rounded-lg ${fullWaterQualityMessage.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                  {fullWaterQualityMessage}
+                </div>
+              )}
+
+              <form onSubmit={handleFullWaterQualitySubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">pH</label>
+                    <input
+                      type="number"
+                      name="ph"
+                      step="0.1"
+                      min="0"
+                      max="14"
+                      required
+                      value={fullWaterQualityFormData.ph}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Temperatura (°C)</label>
+                    <input
+                      type="number"
+                      name="temperature"
+                      step="0.1"
+                      min="0"
+                      max="50"
+                      required
+                      value={fullWaterQualityFormData.temperature}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Oxigenação (mg/L)</label>
+                    <input
+                      type="number"
+                      name="oxygenation"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={fullWaterQualityFormData.oxygenation}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Salinidade (ppt)</label>
+                    <input
+                      type="number"
+                      name="salinity"
+                      step="0.1"
+                      min="0"
+                      value={fullWaterQualityFormData.salinity}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Amônia (mg/L)</label>
+                    <input
+                      type="number"
+                      name="ammonia"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={fullWaterQualityFormData.ammonia}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nitrito (mg/L)</label>
+                    <input
+                      type="number"
+                      name="nitrite"
+                      step="0.1"
+                      min="0"
+                      required
+                      value={fullWaterQualityFormData.nitrite}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nitrato (mg/L)</label>
+                    <input
+                      type="number"
+                      name="nitrate"
+                      step="0.1"
+                      min="0"
+                      value={fullWaterQualityFormData.nitrate}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Alcalinidade (mg/L)</label>
+                    <input
+                      type="number"
+                      name="alkalinity"
+                      step="0.1"
+                      min="0"
+                      value={fullWaterQualityFormData.alkalinity}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Turbidez (NTU)</label>
+                    <input
+                      type="number"
+                      name="turbidity"
+                      step="0.1"
+                      min="0"
+                      value={fullWaterQualityFormData.turbidity}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">ORP (mV)</label>
+                    <input
+                      type="number"
+                      name="orp"
+                      step="1"
+                      value={fullWaterQualityFormData.orp}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">CO₂ (mg/L)</label>
+                    <input
+                      type="number"
+                      name="co2"
+                      step="0.1"
+                      min="0"
+                      value={fullWaterQualityFormData.co2}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data da Vistoria</label>
+                    <input
+                      type="date"
+                      name="inspectionDate"
+                      required
+                      value={fullWaterQualityFormData.inspectionDate}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data da Alimentação</label>
+                    <input
+                      type="date"
+                      name="feedingDate"
+                      required
+                      value={fullWaterQualityFormData.feedingDate}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Responsável</label>
+                    <input
+                      type="text"
+                      name="responsible"
+                      required
+                      value={fullWaterQualityFormData.responsible}
+                      onChange={handleFullWaterQualityChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                  <textarea
+                    name="notes"
+                    rows="3"
+                    value={fullWaterQualityFormData.notes}
+                    onChange={handleFullWaterQualityChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                    placeholder="Observações adicionais (opcional)"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowFullWaterQualityModal(false)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={fullWaterQualityLoading}
+                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {fullWaterQualityLoading ? 'Salvando...' : 'Salvar Dados'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

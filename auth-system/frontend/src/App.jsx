@@ -7,6 +7,7 @@ import TankRegistration from './components/TankRegistration';
 import ShrimpRegistration from './components/ShrimpRegistration';
 import WaterQualityRegistration from './components/WaterQualityRegistration';
 import FeedingRegistration from './components/FeedingRegistration';
+import ExpenseRegistration from './components/ExpenseRegistration';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/shrimp-registration" element={<ShrimpRegistration />} />
           <Route path="/water-quality-registration" element={<WaterQualityRegistration />} />
           <Route path="/feeding-registration" element={<FeedingRegistration />} />
+          <Route path="/expense-registration" element={<ExpenseRegistration />} />
         </Routes>
       </div>
     </Router>

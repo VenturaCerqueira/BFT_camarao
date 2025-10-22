@@ -36,6 +36,7 @@ app.use('/api/tank', require('./routes/tank'));
 app.use('/api/tanks', require('./routes/tanks'));
 app.use('/api/shrimp', require('./routes/shrimp'));
 app.use('/api/feeding', require('./routes/feeding'));
+app.use('/api/expenses', require('./routes/expenses'));
 
 // Protected route example
 app.get('/api/protected', require('./middleware/auth'), (req, res) => {

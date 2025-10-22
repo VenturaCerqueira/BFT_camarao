@@ -17,6 +17,7 @@ import {
   CogIcon,
   XMarkIcon,
   CheckIcon,
+  CurrencyDollarIcon,
   ExclamationTriangleIcon,
   ClockIcon,
   EyeIcon
@@ -390,6 +391,13 @@ const Dashboard = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Alimentação
+              </a>
+              <a
+                href="/expense-registration"
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
+              >
+                <CurrencyDollarIcon className="mr-3 h-5 w-5" />
+                Despesas
               </a>
             </nav>
           </div>

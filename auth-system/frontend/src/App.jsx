@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import TankRegistration from './components/TankRegistration';
 import ShrimpRegistration from './components/ShrimpRegistration';
 import WaterQualityRegistration from './components/WaterQualityRegistration';
+import FeedingRegistration from './components/FeedingRegistration';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/tank-registration" element={<TankRegistration />} />
           <Route path="/shrimp-registration" element={<ShrimpRegistration />} />
           <Route path="/water-quality-registration" element={<WaterQualityRegistration />} />
+          <Route path="/feeding-registration" element={<FeedingRegistration />} />
         </Routes>
       </div>
     </Router>

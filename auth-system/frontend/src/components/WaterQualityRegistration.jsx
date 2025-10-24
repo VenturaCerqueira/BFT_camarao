@@ -16,7 +16,10 @@ import {
   ArrowRightOnRectangleIcon,
   CurrencyDollarIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  SparklesIcon,
+  ChartBarIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 
 const WaterQualityRegistration = () => {
@@ -90,8 +93,10 @@ const WaterQualityRegistration = () => {
               {steps[1]}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="relative">
+                <label className={`absolute left-3 transition-all duration-200 pointer-events-none ${
+                  formData.temperature ? 'top-1 text-xs text-blue-600' : 'top-1/2 -translate-y-1/2 text-sm text-gray-500'
+                }`}>
                   Temperatura (°C) *
                 </label>
                 <div className="relative">
@@ -104,12 +109,12 @@ const WaterQualityRegistration = () => {
                     required
                     value={formData.temperature}
                     onChange={handleChange}
-                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                    className={`w-full pl-10 pr-3 pt-6 pb-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 ${
                       getParameterStatus(formData.temperature, 25, 32, '°C').status === 'warning'
                         ? 'border-yellow-300 bg-yellow-50'
                         : 'border-gray-300'
                     }`}
-                    placeholder="28.5"
+                    placeholder=""
                   />
                   <FireIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-red-400" />
                 </div>
@@ -816,44 +821,66 @@ const WaterQualityRegistration = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modern Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" onClick={() => setShowModal(false)}>
-          <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-6xl shadow-lg rounded-md bg-white" onClick={(e) => e.stopPropagation()}>
-            <div className="mt-3">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Cadastrar Parâmetros de Qualidade da Água
-                </h2>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
+          <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-gray-200/50" onClick={(e) => e.stopPropagation()}>
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-8">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-100 rounded-xl">
+                    <SparklesIcon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Cadastrar Parâmetros de Qualidade da Água
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Preencha os dados de qualidade da água do tanque selecionado
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 hover:bg-gray-100 rounded-xl transition-colors duration-200"
                 >
-                  <XMarkIcon className="h-6 w-6" />
+                  <XMarkIcon className="h-6 w-6 text-gray-400 hover:text-gray-600" />
                 </button>
               </div>
 
-              {/* Step Indicator */}
+              {/* Enhanced Step Indicator with Progress Bar */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progresso</span>
+                    <span>{Math.round(((currentStep + 1) / steps.length) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
                   {steps.map((step, index) => (
                     <div key={index} className="flex items-center">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                      <div className={`flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-all duration-300 ${
                         index < currentStep
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-green-500 text-white shadow-lg scale-110'
                           : index === currentStep
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-300 text-gray-600'
+                          ? 'bg-blue-500 text-white shadow-lg scale-110 animate-pulse'
+                          : 'bg-gray-300 text-gray-600 hover:bg-gray-400'
                       }`}>
                         {index < currentStep ? <CheckIcon className="w-5 h-5" /> : index + 1}
                       </div>
-                      <span className={`ml-2 text-sm font-medium ${
+                      <span className={`ml-3 text-sm font-medium transition-colors duration-300 ${
                         index <= currentStep ? 'text-gray-900' : 'text-gray-500'
                       }`}>
                         {step}
                       </span>
                       {index < steps.length - 1 && (
-                        <div className={`w-12 h-0.5 mx-4 ${
+                        <div className={`w-16 h-0.5 mx-6 transition-colors duration-300 ${
                           index < currentStep ? 'bg-green-500' : 'bg-gray-300'
                         }`} />
                       )}

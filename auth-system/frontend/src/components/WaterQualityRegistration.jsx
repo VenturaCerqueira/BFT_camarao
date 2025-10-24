@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Sidebar from './shared/Sidebar';
 import {
   BeakerIcon,
   FireIcon,
@@ -213,62 +214,7 @@ const WaterQualityRegistration = () => {
 
       {/* Side Menu */}
       <div className="flex">
-        <div className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-6">
-            <nav className="space-y-2">
-              <a
-                href="/dashboard"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Dashboard
-              </a>
-              <a
-                href="/tank-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Cadastrar Tanque
-              </a>
-              <a
-                href="/water-quality-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium bg-blue-100 text-blue-700 rounded-md"
-              >
-                <BeakerIcon className="mr-3 h-5 w-5" />
-                Qualidade da Água
-              </a>
-              <a
-                href="/shrimp-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Cadastrar Camarão
-              </a>
-              <a
-                href="/feeding-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Alimentação
-              </a>
-              <a
-                href="/expense-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <CurrencyDollarIcon className="mr-3 h-5 w-5" />
-                Despesas
-              </a>
-            </nav>
-          </div>
-        </div>
+        <Sidebar />
 
         {/* Main Content */}
         <div className="flex-1 p-8">

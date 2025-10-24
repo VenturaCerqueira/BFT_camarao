@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Layout from './shared/Layout';
 import {
   LineChart,
   Line,
@@ -80,6 +81,11 @@ const Dashboard = () => {
   const [fullWaterQualityLoading, setFullWaterQualityLoading] = useState(false);
   const [fullWaterQualityMessage, setFullWaterQualityMessage] = useState('');
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -203,10 +209,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+
 
   const handleWaterQualityChange = (e) => {
     setWaterQualityFormData({
@@ -318,94 +321,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <img src="/FAZENDA DE CAMARÕES.png" alt="Logo" className="h-8 w-8 rounded-full" />
-                <span className="ml-2 text-xl font-semibold text-gray-900">Controle de Tanque</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Olá, {user?.username}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-              >
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Side Menu and Main Content */}
-      <div className="flex">
-        <div className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-6">
-            <nav className="space-y-2">
-              <a
-                href="/dashboard"
-                className="flex items-center px-4 py-2 text-sm font-medium bg-orange-100 text-orange-700 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Dashboard
-              </a>
-              <a
-                href="/tank-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Cadastrar Tanque
-              </a>
-              <a
-                href="/water-quality-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Qualidade da Água
-              </a>
-              <a
-                href="/shrimp-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Cadastrar Camarão
-              </a>
-              <a
-                href="/feeding-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <svg className="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Alimentação
-              </a>
-              <a
-                href="/expense-registration"
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md"
-              >
-                <CurrencyDollarIcon className="mr-3 h-5 w-5" />
-                Despesas
-              </a>
-            </nav>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          <div className="space-y-6">
+    <>
+      <Layout currentPage="dashboard">
+        <div className="space-y-6">
             {/* Latest Record Card */}
             {latestRecord && (
               <div className="bg-white overflow-hidden shadow rounded-lg">
@@ -780,10 +698,9 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </div>
-      </div>
+    </Layout>
 
-      {/* Water Control Modal */}
+    {/* Water Control Modal */}
       {showWaterControlModal && selectedTank && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
@@ -1456,8 +1373,7 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-    </div>
-  );
+  </>);
 };
 
 // Tank Data Form Component

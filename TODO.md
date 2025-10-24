@@ -1,29 +1,47 @@
-# TODO: Tank Financial Expense Management System
+# Ajuste Menu Lateral - Projeto BFT Camarão
 
-## Backend Development
-- [ ] Create TankExpense model (auth-system/backend/models/TankExpense.js)
-- [ ] Create expense routes (auth-system/backend/routes/expenses.js)
-- [ ] Update server.js to include expense routes
-- [ ] Add financial metrics calculations (total cost per cycle, production yield, net profit, etc.)
+## Objetivos
+- Tornar o menu lateral único e consistente em todas as telas
+- Design bonito, moderno e funcional
+- Cor base laranja
+- Efeitos visuais
 
-## Frontend Development
-- [ ] Create ExpenseRegistration component (auth-system/frontend/src/components/ExpenseRegistration.jsx)
-- [ ] Update App.jsx to include expense routes
-- [ ] Update navigation menus in existing components to include expense link
-- [ ] Create financial dashboard with metrics visualization
+## Tarefas
 
-## Features to Implement
-- [ ] Daily expense registration per tank
-- [ ] Expense categories (feeding, maintenance, utilities, etc.)
-- [ ] Financial metrics calculation:
-  - Total cost per cycle
-  - Production yield (kg/m²)
-  - Net profit and profit margin
-  - Harvest history and batch comparison
-- [ ] Expense reports and analytics
+### 1. Atualizar Sidebar.jsx
+- [ ] Design moderno com gradientes e sombras
+- [ ] Cor base laranja (#f97316 ou similar)
+- [ ] Efeitos hover e transições suaves
+- [ ] Ícones animados
+- [ ] Indicador visual para página ativa
+- [ ] Responsividade aprimorada
 
-## Testing
-- [ ] Test expense registration functionality
-- [ ] Verify financial calculations
-- [ ] Check data persistence and retrieval
-- [ ] Test form validation and error handling
+### 2. Atualizar Layout.jsx
+- [ ] Garantir integração perfeita com Sidebar atualizado
+- [ ] Layout responsivo
+
+### 3. Modificar Dashboard.jsx
+- [ ] Remover header e sidebar hardcoded
+- [ ] Usar Layout.jsx consistentemente
+- [ ] Ajustar estrutura para usar Layout
+
+### 4. Modificar TankRegistration.jsx
+- [ ] Remover header e sidebar hardcoded
+- [ ] Usar Layout.jsx consistentemente
+- [ ] Ajustar estrutura para usar Layout
+
+### 5. Verificar outras páginas
+- [ ] ShrimpRegistration.jsx
+- [ ] WaterQualityRegistration.jsx
+- [ ] FeedingRegistration.jsx
+- [ ] ExpenseRegistration.jsx
+- [ ] Garantir todas usam Layout.jsx
+
+### 6. Atualizar Header.jsx (se necessário)
+- [ ] Consistência visual com sidebar
+- [ ] Design moderno
+
+### 7. Testes
+- [ ] Verificar navegação em todas as páginas
+- [ ] Responsividade
+- [ ] Funcionalidade do menu

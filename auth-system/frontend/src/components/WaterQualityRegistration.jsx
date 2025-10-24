@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Sidebar from './shared/Sidebar';
+import Layout from './shared/Layout';
 import {
   BeakerIcon,
   FireIcon,
@@ -154,10 +154,7 @@ const WaterQualityRegistration = () => {
     });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+
 
   const getParameterStatus = (value, min, max, unit = '') => {
     if (!value) return { status: 'neutral', message: '' };
@@ -177,148 +174,104 @@ const WaterQualityRegistration = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+    <Layout currentPage="/water-quality-registration">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <img src="/FAZENDA DE CAMARÕES.png" alt="Logo" className="h-8 w-8 rounded-full" />
-                <span className="ml-2 text-xl font-semibold text-gray-900">Controle de Qualidade da Água</span>
-              </div>
+              <BeakerIcon className="h-8 w-8 text-blue-500 mr-3" />
+              <h1 className="text-2xl font-bold text-gray-900">Cadastro de Qualidade da Água</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => navigate('/tank-registration')}
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Tanques
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-              >
-                Sair
-              </button>
-            </div>
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
+            >
+              <BeakerIcon className="mr-2 h-5 w-5" />
+              Cadastrar Parâmetros
+            </button>
           </div>
+          <p className="text-gray-600">
+            Registre os parâmetros de qualidade da água dos tanques. Monitore continuamente os valores para manter condições ideais para o cultivo.
+          </p>
         </div>
-      </nav>
 
-      {/* Side Menu */}
-      <div className="flex">
-        <Sidebar />
-
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          <div className="max-w-4xl mx-auto space-y-8">
-            {/* Header */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center">
-                  <BeakerIcon className="h-8 w-8 text-blue-500 mr-3" />
-                  <h1 className="text-2xl font-bold text-gray-900">Cadastro de Qualidade da Água</h1>
-                </div>
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
-                >
-                  <BeakerIcon className="mr-2 h-5 w-5" />
-                  Cadastrar Parâmetros
-                </button>
-              </div>
-              <p className="text-gray-600">
-                Registre os parâmetros de qualidade da água dos tanques. Monitore continuamente os valores para manter condições ideais para o cultivo.
-              </p>
-            </div>
-
-            {/* List of Registered Water Quality Data */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-500" />
-                Lista de Cadastros de Qualidade da Água
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data da Vistoria
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        pH
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Temperatura (°C)
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Oxigênio (mg/L)
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Salinidade (ppt)
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Responsável
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Ações
-                      </th>
+        {/* List of Registered Water Quality Data */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-500" />
+            Lista de Cadastros de Qualidade da Água
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Data da Vistoria
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    pH
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Temperatura (°C)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Oxigênio (mg/L)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Salinidade (ppt)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Responsável
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {dataLoading ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                      Carregando dados...
+                    </td>
+                  </tr>
+                ) : tankDataList.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                      Nenhum dado encontrado.
+                    </td>
+                  </tr>
+                ) : (
+                  tankDataList.map((data) => (
+                    <tr key={data._id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(data.inspectionDate).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.ph}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.temperature}°C
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.oxygenation} mg/L
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.salinity} ppt
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {data.responsible}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {/* Ações - placeholder for future edit/delete */}
+                        -
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {dataLoading ? (
-                      <tr>
-                        <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                          Carregando dados...
-                        </td>
-                      </tr>
-                    ) : tankDataList.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                          Nenhum dado encontrado.
-                        </td>
-                      </tr>
-                    ) : (
-                      tankDataList.map((data) => (
-                        <tr key={data._id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(data.inspectionDate).toLocaleDateString('pt-BR')}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {data.ph}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {data.temperature}°C
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {data.oxygenation} mg/L
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {data.salinity} ppt
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {data.responsible}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {/* Ações - placeholder for future edit/delete */}
-                            -
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -841,7 +794,7 @@ const WaterQualityRegistration = () => {
           </div>
         </div>
       )}
-    </div>
+    </Layout>
   );
 };
 

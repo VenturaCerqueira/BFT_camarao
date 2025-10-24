@@ -14,7 +14,9 @@ import {
   DocumentTextIcon,
   CubeIcon,
   ArrowRightOnRectangleIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
 const WaterQualityRegistration = () => {
@@ -26,6 +28,7 @@ const WaterQualityRegistration = () => {
   const [showModal, setShowModal] = useState(false);
   const [tankDataList, setTankDataList] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     ph: '',
     temperature: '',
@@ -44,6 +47,494 @@ const WaterQualityRegistration = () => {
     notes: ''
   });
   const navigate = useNavigate();
+
+  const steps = [
+    'Seleção de Tanque',
+    'Parâmetros Críticos - Monitoramento Contínuo',
+    'Parâmetros Diários',
+    'Parâmetros Semanais',
+    'Parâmetros Ocasional',
+    'Detalhes da Vistoria'
+  ];
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <CubeIcon className="h-5 w-5 mr-2 text-blue-500" />
+              {steps[0]}
+            </h3>
+            <div className="max-w-md">
+              <select
+                value={selectedTank}
+                onChange={handleTankSelection}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Selecione um tanque...</option>
+                {tanks.map((tank) => (
+                  <option key={tank._id} value={tank._id}>
+                    {tank.name} - {tank.capacity}L
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        );
+      case 1:
+        return (
+          <div className="border border-green-200 bg-green-50 p-6 rounded-lg">
+            <h3 className="text-md font-semibold text-green-800 mb-4 flex items-center">
+              <ClockIcon className="h-5 w-5 mr-2" />
+              {steps[1]}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Temperatura (°C) *
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="temperature"
+                    step="0.1"
+                    min="0"
+                    max="50"
+                    required
+                    value={formData.temperature}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                      getParameterStatus(formData.temperature, 25, 32, '°C').status === 'warning'
+                        ? 'border-yellow-300 bg-yellow-50'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="28.5"
+                  />
+                  <FireIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-red-400" />
+                </div>
+                {formData.temperature && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.temperature, 25, 32, '°C').status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.temperature, 25, 32, '°C').message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Oxigênio Dissolvido (mg/L) *
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="oxygenation"
+                    step="0.1"
+                    min="0"
+                    required
+                    value={formData.oxygenation}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                      getParameterStatus(formData.oxygenation, 4, 8).status === 'warning'
+                        ? 'border-yellow-300 bg-yellow-50'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="6.5"
+                  />
+                  <CloudIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-400" />
+                </div>
+                {formData.oxygenation && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.oxygenation, 4, 8).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.oxygenation, 4, 8).message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  pH *
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    name="ph"
+                    step="0.1"
+                    min="0"
+                    max="14"
+                    required
+                    value={formData.ph}
+                    onChange={handleChange}
+                    className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      getParameterStatus(formData.ph, 7.5, 8.5).status === 'warning'
+                        ? 'border-yellow-300 bg-yellow-50'
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="8.0"
+                  />
+                  <BeakerIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-400" />
+                </div>
+                {formData.ph && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.ph, 7.5, 8.5).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.ph, 7.5, 8.5).message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="border border-blue-200 bg-blue-50 p-6 rounded-lg">
+            <h3 className="text-md font-semibold text-blue-800 mb-4 flex items-center">
+              <ClockIcon className="h-5 w-5 mr-2" />
+              {steps[2]}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Salinidade (ppt)
+                </label>
+                <input
+                  type="number"
+                  name="salinity"
+                  step="0.1"
+                  min="0"
+                  value={formData.salinity}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent ${
+                    getParameterStatus(formData.salinity, 15, 25, 'ppt').status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="20.0"
+                />
+                {formData.salinity && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.salinity, 15, 25, 'ppt').status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.salinity, 15, 25, 'ppt').message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amônia (NH₃/NH₄⁺) (mg/L)
+                </label>
+                <input
+                  type="number"
+                  name="ammonia"
+                  step="0.01"
+                  min="0"
+                  value={formData.ammonia}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    getParameterStatus(formData.ammonia, 0, 0.5).status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="0.1"
+                />
+                {formData.ammonia && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.ammonia, 0, 0.5).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.ammonia, 0, 0.5).message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nitrito (NO₂⁻) (mg/L)
+                </label>
+                <input
+                  type="number"
+                  name="nitrite"
+                  step="0.01"
+                  min="0"
+                  value={formData.nitrite}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
+                    getParameterStatus(formData.nitrite, 0, 1).status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="0.5"
+                />
+                {formData.nitrite && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.nitrite, 0, 1).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.nitrite, 0, 1).message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Turbidez (NTU)
+                </label>
+                <input
+                  type="number"
+                  name="turbidity"
+                  step="0.1"
+                  min="0"
+                  value={formData.turbidity}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+                    getParameterStatus(formData.turbidity, 0, 50).status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="25.0"
+                />
+                {formData.turbidity && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.turbidity, 0, 50).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.turbidity, 0, 50).message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ORP (Potencial de Redox) (mV)
+                </label>
+                <input
+                  type="number"
+                  name="orp"
+                  step="1"
+                  value={formData.orp}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                    getParameterStatus(formData.orp, 200, 400, 'mV').status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="300"
+                />
+                {formData.orp && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.orp, 200, 400, 'mV').status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.orp, 200, 400, 'mV').message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="border border-purple-200 bg-purple-50 p-6 rounded-lg">
+            <h3 className="text-md font-semibold text-purple-800 mb-4 flex items-center">
+              <ClockIcon className="h-5 w-5 mr-2" />
+              {steps[3]}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nitrato (NO₃⁻) (mg/L)
+                </label>
+                <input
+                  type="number"
+                  name="nitrate"
+                  step="0.1"
+                  min="0"
+                  value={formData.nitrate}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                    getParameterStatus(formData.nitrate, 0, 100).status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="50.0"
+                />
+                {formData.nitrate && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.nitrate, 0, 100).status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.nitrate, 0, 100).message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Alcalinidade (mg/L CaCO₃)
+                </label>
+                <input
+                  type="number"
+                  name="alkalinity"
+                  step="0.1"
+                  min="0"
+                  value={formData.alkalinity}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
+                    getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').status === 'warning'
+                      ? 'border-yellow-300 bg-yellow-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="150.0"
+                />
+                {formData.alkalinity && (
+                  <p className={`text-xs mt-1 ${
+                    getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').status === 'warning'
+                      ? 'text-yellow-600'
+                      : 'text-green-600'
+                  }`}>
+                    {getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').message}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="border border-gray-200 bg-gray-50 p-6 rounded-lg">
+            <h3 className="text-md font-semibold text-gray-800 mb-4 flex items-center">
+              <ClockIcon className="h-5 w-5 mr-2" />
+              {steps[4]}
+            </h3>
+            <div className="max-w-md">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                CO₂ Dissolvido (mg/L)
+              </label>
+              <input
+                type="number"
+                name="co2"
+                step="0.1"
+                min="0"
+                value={formData.co2}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
+                  getParameterStatus(formData.co2, 0, 20).status === 'warning'
+                    ? 'border-yellow-300 bg-yellow-50'
+                    : 'border-gray-300'
+                }`}
+                placeholder="5.0"
+              />
+              {formData.co2 && (
+                <p className={`text-xs mt-1 ${
+                  getParameterStatus(formData.co2, 0, 20).status === 'warning'
+                    ? 'text-yellow-600'
+                    : 'text-green-600'
+                }`}>
+                  {getParameterStatus(formData.co2, 0, 20).message}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      case 5:
+        return (
+          <div className="border border-gray-200 p-6 rounded-lg">
+            <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
+              <DocumentTextIcon className="h-5 w-5 mr-2 text-gray-500" />
+              {steps[5]}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data da Vistoria *
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="inspectionDate"
+                    required
+                    value={formData.inspectionDate}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                  <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data da Alimentação *
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="feedingDate"
+                    required
+                    value={formData.feedingDate}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                  <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Responsável *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="responsible"
+                    required
+                    value={formData.responsible}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Nome do responsável"
+                  />
+                  <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Observações
+              </label>
+              <div className="relative">
+                <textarea
+                  name="notes"
+                  rows="3"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                  placeholder="Observações adicionais sobre a qualidade da água..."
+                />
+                <DocumentTextIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     fetchTanks();
@@ -154,7 +645,42 @@ const WaterQualityRegistration = () => {
     });
   };
 
+  const handleTankSelection = (e) => {
+    setSelectedTank(e.target.value);
+    if (e.target.value) {
+      // Auto-advance to next step after tank selection
+      setTimeout(() => nextStep(), 500);
+    }
+  };
 
+  const validateStep = (step) => {
+    switch (step) {
+      case 0: // Tank Selection
+        return selectedTank !== '';
+      case 1: // Critical Parameters
+        return formData.temperature && formData.oxygenation && formData.ph;
+      case 5: // Inspection Details
+        return formData.inspectionDate && formData.feedingDate && formData.responsible;
+      default:
+        return true; // Other steps are optional
+    }
+  };
+
+  const canProceedToNext = () => {
+    return validateStep(currentStep);
+  };
+
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   const getParameterStatus = (value, min, max, unit = '') => {
     if (!value) return { status: 'neutral', message: '' };
@@ -177,101 +703,115 @@ const WaterQualityRegistration = () => {
     <Layout currentPage="/water-quality-registration">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center">
-              <BeakerIcon className="h-8 w-8 text-blue-500 mr-3" />
-              <h1 className="text-2xl font-bold text-gray-900">Cadastro de Qualidade da Água</h1>
+        <div className="bg-gradient-to-br from-white via-blue-50 to-white p-8 rounded-2xl shadow-xl border border-blue-100 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200 to-transparent rounded-full opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300 to-transparent rounded-full opacity-15"></div>
+
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center">
+                <BeakerIcon className="h-8 w-8 text-blue-500 mr-3" />
+                <h1 className="text-2xl font-bold text-gray-900">Cadastro de Qualidade da Água</h1>
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <BeakerIcon className="mr-2 h-5 w-5" />
+                Cadastrar Parâmetros
+              </button>
             </div>
-            <button
-              onClick={() => setShowModal(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
-            >
-              <BeakerIcon className="mr-2 h-5 w-5" />
-              Cadastrar Parâmetros
-            </button>
+            <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-4 rounded-lg border-l-4 border-blue-500">
+              <p className="text-blue-800 text-lg leading-relaxed font-semibold">
+                Registre os parâmetros de qualidade da água dos tanques. Monitore continuamente os valores para manter condições ideais para o cultivo.
+              </p>
+            </div>
           </div>
-          <p className="text-gray-600">
-            Registre os parâmetros de qualidade da água dos tanques. Monitore continuamente os valores para manter condições ideais para o cultivo.
-          </p>
         </div>
 
         {/* List of Registered Water Quality Data */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-500" />
-            Lista de Cadastros de Qualidade da Água
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Data da Vistoria
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    pH
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Temperatura (°C)
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Oxigênio (mg/L)
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Salinidade (ppt)
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Responsável
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {dataLoading ? (
+        <div className="bg-gradient-to-br from-white via-orange-50 to-white p-8 rounded-2xl shadow-xl border border-orange-100 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200 to-transparent rounded-full opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-300 to-transparent rounded-full opacity-15"></div>
+
+          <div className="relative z-10">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <DocumentTextIcon className="h-5 w-5 mr-2 text-blue-500" />
+              Lista de Cadastros de Qualidade da Água
+            </h2>
+            <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-orange-100">
+              <table className="min-w-full divide-y divide-orange-100">
+                <thead className="bg-gradient-to-r from-orange-50 to-orange-100">
                   <tr>
-                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                      Carregando dados...
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Data da Vistoria
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      pH
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Temperatura (°C)
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Oxigênio (mg/L)
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Salinidade (ppt)
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Responsável
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">
+                      Ações
+                    </th>
                   </tr>
-                ) : tankDataList.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                      Nenhum dado encontrado.
-                    </td>
-                  </tr>
-                ) : (
-                  tankDataList.map((data) => (
-                    <tr key={data._id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(data.inspectionDate).toLocaleDateString('pt-BR')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {data.ph}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {data.temperature}°C
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {data.oxygenation} mg/L
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {data.salinity} ppt
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {data.responsible}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {/* Ações - placeholder for future edit/delete */}
-                        -
+                </thead>
+                <tbody className="bg-white divide-y divide-orange-50">
+                  {dataLoading ? (
+                    <tr>
+                      <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                        Carregando dados...
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : tankDataList.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
+                        Nenhum dado encontrado.
+                      </td>
+                    </tr>
+                  ) : (
+                    tankDataList.map((data) => (
+                      <tr key={data._id} className="hover:bg-gradient-to-r hover:from-orange-25 hover:to-orange-50 transition-all duration-300 transform hover:scale-[1.01]">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(data.inspectionDate).toLocaleDateString('pt-BR')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {data.ph}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {data.temperature}°C
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {data.oxygenation} mg/L
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {data.salinity} ppt
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {data.responsible}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {/* Ações - placeholder for future edit/delete */}
+                          -
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -293,503 +833,85 @@ const WaterQualityRegistration = () => {
                 </button>
               </div>
 
-              {/* Tank Selection */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <CubeIcon className="h-5 w-5 mr-2 text-blue-500" />
-                  Selecionar Tanque
-                </h3>
-                <div className="max-w-md">
-                  <select
-                    value={selectedTank}
-                    onChange={(e) => setSelectedTank(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Selecione um tanque...</option>
-                    {tanks.map((tank) => (
-                      <option key={tank._id} value={tank._id}>
-                        {tank.name} - {tank.capacity}L
-                      </option>
-                    ))}
-                  </select>
+              {/* Step Indicator */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  {steps.map((step, index) => (
+                    <div key={index} className="flex items-center">
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
+                        index < currentStep
+                          ? 'bg-green-500 text-white'
+                          : index === currentStep
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-gray-300 text-gray-600'
+                      }`}>
+                        {index < currentStep ? <CheckIcon className="w-5 h-5" /> : index + 1}
+                      </div>
+                      <span className={`ml-2 text-sm font-medium ${
+                        index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                      }`}>
+                        {step}
+                      </span>
+                      {index < steps.length - 1 && (
+                        <div className={`w-12 h-0.5 mx-4 ${
+                          index < currentStep ? 'bg-green-500' : 'bg-gray-300'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Registration Form */}
-              {selectedTank && (
-                <>
-                  {message && (
-                    <div className={`mb-6 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
-                      <div className="flex items-center">
-                        {message.includes('sucesso') ? (
-                          <CheckIcon className="h-5 w-5 mr-2" />
-                        ) : (
-                          <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
-                        )}
-                        {message}
-                      </div>
-                    </div>
-                  )}
-
-                  <form onSubmit={handleSubmit} className="space-y-8">
-                    {/* Critical Parameters - Continuous Monitoring */}
-                    <div className="border border-green-200 bg-green-50 p-6 rounded-lg">
-                      <h3 className="text-md font-semibold text-green-800 mb-4 flex items-center">
-                        <ClockIcon className="h-5 w-5 mr-2" />
-                        Parâmetros Críticos - Monitoramento Contínuo
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Temperatura (°C) *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              name="temperature"
-                              step="0.1"
-                              min="0"
-                              max="50"
-                              required
-                              value={formData.temperature}
-                              onChange={handleChange}
-                              className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                                getParameterStatus(formData.temperature, 25, 32, '°C').status === 'warning'
-                                  ? 'border-yellow-300 bg-yellow-50'
-                                  : 'border-gray-300'
-                              }`}
-                              placeholder="28.5"
-                            />
-                            <FireIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-red-400" />
-                          </div>
-                          {formData.temperature && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.temperature, 25, 32, '°C').status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.temperature, 25, 32, '°C').message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Oxigênio Dissolvido (mg/L) *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              name="oxygenation"
-                              step="0.1"
-                              min="0"
-                              required
-                              value={formData.oxygenation}
-                              onChange={handleChange}
-                              className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                                getParameterStatus(formData.oxygenation, 4, 8).status === 'warning'
-                                  ? 'border-yellow-300 bg-yellow-50'
-                                  : 'border-gray-300'
-                              }`}
-                              placeholder="6.5"
-                            />
-                            <CloudIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-400" />
-                          </div>
-                          {formData.oxygenation && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.oxygenation, 4, 8).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.oxygenation, 4, 8).message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            pH *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="number"
-                              name="ph"
-                              step="0.1"
-                              min="0"
-                              max="14"
-                              required
-                              value={formData.ph}
-                              onChange={handleChange}
-                              className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                getParameterStatus(formData.ph, 7.5, 8.5).status === 'warning'
-                                  ? 'border-yellow-300 bg-yellow-50'
-                                  : 'border-gray-300'
-                              }`}
-                              placeholder="8.0"
-                            />
-                            <BeakerIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-400" />
-                          </div>
-                          {formData.ph && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.ph, 7.5, 8.5).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.ph, 7.5, 8.5).message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Daily Parameters */}
-                    <div className="border border-blue-200 bg-blue-50 p-6 rounded-lg">
-                      <h3 className="text-md font-semibold text-blue-800 mb-4 flex items-center">
-                        <ClockIcon className="h-5 w-5 mr-2" />
-                        Parâmetros Diários
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Salinidade (ppt)
-                          </label>
-                          <input
-                            type="number"
-                            name="salinity"
-                            step="0.1"
-                            min="0"
-                            value={formData.salinity}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent ${
-                              getParameterStatus(formData.salinity, 15, 25, 'ppt').status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="20.0"
-                          />
-                          {formData.salinity && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.salinity, 15, 25, 'ppt').status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.salinity, 15, 25, 'ppt').message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Amônia (NH₃/NH₄⁺) (mg/L)
-                          </label>
-                          <input
-                            type="number"
-                            name="ammonia"
-                            step="0.01"
-                            min="0"
-                            value={formData.ammonia}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                              getParameterStatus(formData.ammonia, 0, 0.5).status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="0.1"
-                          />
-                          {formData.ammonia && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.ammonia, 0, 0.5).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.ammonia, 0, 0.5).message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Nitrito (NO₂⁻) (mg/L)
-                          </label>
-                          <input
-                            type="number"
-                            name="nitrite"
-                            step="0.01"
-                            min="0"
-                            value={formData.nitrite}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${
-                              getParameterStatus(formData.nitrite, 0, 1).status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="0.5"
-                          />
-                          {formData.nitrite && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.nitrite, 0, 1).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.nitrite, 0, 1).message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Turbidez (NTU)
-                          </label>
-                          <input
-                            type="number"
-                            name="turbidity"
-                            step="0.1"
-                            min="0"
-                            value={formData.turbidity}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
-                              getParameterStatus(formData.turbidity, 0, 50).status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="25.0"
-                          />
-                          {formData.turbidity && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.turbidity, 0, 50).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.turbidity, 0, 50).message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            ORP (Potencial de Redox) (mV)
-                          </label>
-                          <input
-                            type="number"
-                            name="orp"
-                            step="1"
-                            value={formData.orp}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                              getParameterStatus(formData.orp, 200, 400, 'mV').status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="300"
-                          />
-                          {formData.orp && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.orp, 200, 400, 'mV').status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.orp, 200, 400, 'mV').message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Weekly Parameters */}
-                    <div className="border border-purple-200 bg-purple-50 p-6 rounded-lg">
-                      <h3 className="text-md font-semibold text-purple-800 mb-4 flex items-center">
-                        <ClockIcon className="h-5 w-5 mr-2" />
-                        Parâmetros Semanais
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Nitrato (NO₃⁻) (mg/L)
-                          </label>
-                          <input
-                            type="number"
-                            name="nitrate"
-                            step="0.1"
-                            min="0"
-                            value={formData.nitrate}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
-                              getParameterStatus(formData.nitrate, 0, 100).status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="50.0"
-                          />
-                          {formData.nitrate && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.nitrate, 0, 100).status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.nitrate, 0, 100).message}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Alcalinidade (mg/L CaCO₃)
-                          </label>
-                          <input
-                            type="number"
-                            name="alkalinity"
-                            step="0.1"
-                            min="0"
-                            value={formData.alkalinity}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                              getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').status === 'warning'
-                                ? 'border-yellow-300 bg-yellow-50'
-                                : 'border-gray-300'
-                            }`}
-                            placeholder="150.0"
-                          />
-                          {formData.alkalinity && (
-                            <p className={`text-xs mt-1 ${
-                              getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').status === 'warning'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                            }`}>
-                              {getParameterStatus(formData.alkalinity, 100, 200, 'mg/L').message}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Occasional Parameters */}
-                    <div className="border border-gray-200 bg-gray-50 p-6 rounded-lg">
-                      <h3 className="text-md font-semibold text-gray-800 mb-4 flex items-center">
-                        <ClockIcon className="h-5 w-5 mr-2" />
-                        Parâmetros Ocasional
-                      </h3>
-                      <div className="max-w-md">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          CO₂ Dissolvido (mg/L)
-                        </label>
-                        <input
-                          type="number"
-                          name="co2"
-                          step="0.1"
-                          min="0"
-                          value={formData.co2}
-                          onChange={handleChange}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
-                            getParameterStatus(formData.co2, 0, 20).status === 'warning'
-                              ? 'border-yellow-300 bg-yellow-50'
-                              : 'border-gray-300'
-                          }`}
-                          placeholder="5.0"
-                        />
-                        {formData.co2 && (
-                          <p className={`text-xs mt-1 ${
-                            getParameterStatus(formData.co2, 0, 20).status === 'warning'
-                              ? 'text-yellow-600'
-                              : 'text-green-600'
-                          }`}>
-                            {getParameterStatus(formData.co2, 0, 20).message}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Inspection Details */}
-                    <div className="border border-gray-200 p-6 rounded-lg">
-                      <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                        <DocumentTextIcon className="h-5 w-5 mr-2 text-gray-500" />
-                        Detalhes da Vistoria
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Data da Vistoria *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="date"
-                              name="inspectionDate"
-                              required
-                              value={formData.inspectionDate}
-                              onChange={handleChange}
-                              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            />
-                            <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Data da Alimentação *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="date"
-                              name="feedingDate"
-                              required
-                              value={formData.feedingDate}
-                              onChange={handleChange}
-                              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            />
-                            <ClockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Responsável *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              name="responsible"
-                              required
-                              value={formData.responsible}
-                              onChange={handleChange}
-                              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                              placeholder="Nome do responsável"
-                            />
-                            <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Observações
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            name="notes"
-                            rows="3"
-                            value={formData.notes}
-                            onChange={handleChange}
-                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                            placeholder="Observações adicionais sobre a qualidade da água..."
-                          />
-                          <DocumentTextIcon className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center font-medium"
-                      >
-                        <ArrowRightOnRectangleIcon className="mr-2 h-5 w-5" />
-                        {loading ? 'Salvando...' : 'Salvar Dados'}
-                      </button>
-                    </div>
-                  </form>
-                </>
+              {/* Messages */}
+              {message && (
+                <div className={`mb-6 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                  <div className="flex items-center">
+                    {message.includes('sucesso') ? (
+                      <CheckIcon className="h-5 w-5 mr-2" />
+                    ) : (
+                      <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+                    )}
+                    {message}
+                  </div>
+                </div>
               )}
+
+              {/* Step Content */}
+              <div className="mb-8">
+                {renderStepContent()}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between">
+                <button
+                  onClick={prevStep}
+                  disabled={currentStep === 0}
+                  className="bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed text-gray-700 px-6 py-2 rounded-lg flex items-center transition-colors duration-200"
+                >
+                  <ChevronLeftIcon className="mr-2 h-5 w-5" />
+                  Anterior
+                </button>
+
+                {currentStep < steps.length - 1 ? (
+                  <button
+                    onClick={nextStep}
+                    disabled={!canProceedToNext()}
+                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg flex items-center transition-colors duration-200"
+                  >
+                    Próximo
+                    <ChevronRightIcon className="ml-2 h-5 w-5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={loading || !canProceedToNext()}
+                    className="bg-green-500 hover:bg-green-600 disabled:bg-green-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg flex items-center font-medium transition-colors duration-200"
+                  >
+                    <ArrowRightOnRectangleIcon className="mr-2 h-5 w-5" />
+                    {loading ? 'Salvando...' : 'Salvar Dados'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

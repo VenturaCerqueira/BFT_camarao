@@ -282,101 +282,107 @@ const FeedingRegistration = () => {
     <Layout currentPage="feeding-registration">
       <div className="space-y-8">
         {/* Feeding List */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-green-500 flex items-center">
-              <svg className="mr-3 h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Registros de Alimentação
-            </h2>
-            <button
-              onClick={() => setShowModal(!showModal)}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
-            >
-              <PlusIcon className="mr-2 h-5 w-5" />
-              Cadastrar Alimentação
-            </button>
-          </div>
+        <div className="bg-gradient-to-br from-white via-green-50 to-white p-8 rounded-2xl shadow-xl border border-green-100 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-200 to-transparent rounded-full opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-300 to-transparent rounded-full opacity-15"></div>
 
-          {message && (
-            <div className={`mb-4 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-              {message}
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-green-500 flex items-center">
+                <svg className="mr-3 h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Registros de Alimentação
+              </h2>
+              <button
+                onClick={() => setShowModal(!showModal)}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
+              >
+                <PlusIcon className="mr-2 h-5 w-5" />
+                Cadastrar Alimentação
+              </button>
             </div>
-          )}
 
-          {fetchLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
-              <p className="mt-2 text-gray-600">Carregando registros...</p>
-            </div>
-          ) : feeding.length === 0 ? (
-            <div className="text-center py-8">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <p className="mt-2 text-gray-600">Nenhum registro de alimentação cadastrado ainda.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanque</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Ração</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aeração (h/dia)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Manutenção</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Troca de Água</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {feeding.map((item) => (
-                    <tr key={item._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{new Date(item.feedingDate).toLocaleDateString('pt-BR')}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.tankId.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedType}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedQuantity} {item.feedUnit}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.aerationTime}h</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.equipmentMaintenance && (
-                          <div className="flex flex-wrap gap-1">
-                            {item.equipmentMaintenance.pumps && <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Bombas</span>}
-                            {item.equipmentMaintenance.aerators && <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Aeradores</span>}
-                            {item.equipmentMaintenance.filters && <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Filtros</span>}
-                            {item.equipmentMaintenance.otherEquipment && <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Outros</span>}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.waterExchange?.performed ? `${item.waterExchange.volume} ${item.waterExchange.volumeUnit}` : 'Não'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.responsible}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="text-indigo-600 hover:text-indigo-900 mr-4 flex items-center"
-                        >
-                          <PencilIcon className="mr-1 h-4 w-4" />
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="text-red-600 hover:text-red-900 flex items-center"
-                        >
-                          <TrashIcon className="mr-1 h-4 w-4" />
-                          Excluir
-                        </button>
-                      </td>
+            {message && (
+              <div className={`mb-4 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                {message}
+              </div>
+            )}
+
+            {fetchLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Carregando registros...</p>
+              </div>
+            ) : feeding.length === 0 ? (
+              <div className="text-center py-8">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <p className="mt-2 text-gray-600">Nenhum registro de alimentação cadastrado ainda.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-green-100">
+                <table className="min-w-full divide-y divide-green-100">
+                  <thead className="bg-gradient-to-r from-green-50 to-green-100">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Data</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Tanque</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Tipo de Ração</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Quantidade</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Aeração (h/dia)</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Manutenção</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Troca de Água</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Responsável</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Ações</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody className="bg-white divide-y divide-green-50">
+                    {feeding.map((item) => (
+                      <tr key={item._id} className="hover:bg-gradient-to-r hover:from-green-25 hover:to-green-50 transition-all duration-300 transform hover:scale-[1.01]">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{new Date(item.feedingDate).toLocaleDateString('pt-BR')}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.tankId.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedType}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.feedQuantity} {item.feedUnit}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.aerationTime}h</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.equipmentMaintenance && (
+                            <div className="flex flex-wrap gap-1">
+                              {item.equipmentMaintenance.pumps && <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Bombas</span>}
+                              {item.equipmentMaintenance.aerators && <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Aeradores</span>}
+                              {item.equipmentMaintenance.filters && <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Filtros</span>}
+                              {item.equipmentMaintenance.otherEquipment && <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Outros</span>}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.waterExchange?.performed ? `${item.waterExchange.volume} ${item.waterExchange.volumeUnit}` : 'Não'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.responsible}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="text-indigo-600 hover:text-indigo-900 mr-4 flex items-center"
+                          >
+                            <PencilIcon className="mr-1 h-4 w-4" />
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="text-red-600 hover:text-red-900 flex items-center"
+                          >
+                            <TrashIcon className="mr-1 h-4 w-4" />
+                            Excluir
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

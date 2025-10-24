@@ -151,20 +151,25 @@ const TankRegistration = () => {
     <Layout currentPage="tank-registration">
       <div className="space-y-8">
         {/* Tank List */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-orange-500 flex items-center">
-              <CubeIcon className="mr-3 h-8 w-8 text-orange-500" />
-              Tanques Cadastrados
-            </h2>
-            <button
-              onClick={() => setShowModal(!showModal)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
-            >
-              <PlusIcon className="mr-2 h-5 w-5" />
-              Cadastrar Tanque
-            </button>
-          </div>
+        <div className="bg-gradient-to-br from-white via-orange-50 to-white p-8 rounded-2xl shadow-xl border border-orange-100 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200 to-transparent rounded-full opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-300 to-transparent rounded-full opacity-15"></div>
+
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent flex items-center">
+                <CubeIcon className="mr-4 h-10 w-10 text-orange-500" />
+                Tanques Cadastrados
+              </h2>
+              <button
+                onClick={() => setShowModal(!showModal)}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center shadow-md"
+              >
+                <PlusIcon className="mr-2 h-5 w-5" />
+                Cadastrar Tanque
+              </button>
+            </div>
 
           {message && (
             <div className={`mb-4 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -183,43 +188,43 @@ const TankRegistration = () => {
               <p className="mt-2 text-gray-600">Nenhum tanque cadastrado ainda.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-orange-100">
+              <table className="min-w-full divide-y divide-orange-100">
+                <thead className="bg-gradient-to-r from-orange-50 to-orange-100">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacidade</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Nome</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Capacidade</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Responsável</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-orange-50">
                   {tanks.map((tank) => (
-                    <tr key={tank._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tank.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tank.capacity} L</td>
+                    <tr key={tank._id} className="hover:bg-gradient-to-r hover:from-orange-25 hover:to-orange-50 transition-all duration-300 transform hover:scale-[1.01]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{tank.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tank.capacity} L</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          tank.status === 'Ativo' ? 'bg-green-100 text-green-800' :
-                          tank.status === 'Manutenção' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${
+                          tank.status === 'Ativo' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300' :
+                          tank.status === 'Manutenção' ? 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300' :
+                          'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300'
                         }`}>
                           {tank.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tank.technicalResponsible}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tank.technicalResponsible}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => handleEdit(tank)}
-                          className="text-indigo-600 hover:text-indigo-900 mr-4 flex items-center"
+                          className="text-blue-600 hover:text-blue-800 mr-4 flex items-center transition-all duration-300 transform hover:scale-110"
                         >
                           <PencilIcon className="mr-1 h-4 w-4" />
                           Editar
                         </button>
                         <button
                           onClick={() => handleDelete(tank._id)}
-                          className="text-red-600 hover:text-red-900 flex items-center"
+                          className="text-red-600 hover:text-red-800 flex items-center transition-all duration-300 transform hover:scale-110"
                         >
                           <TrashIcon className="mr-1 h-4 w-4" />
                           Excluir
@@ -231,21 +236,23 @@ const TankRegistration = () => {
               </table>
             </div>
           )}
+          </div>
         </div>
       </div>
 
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" onClick={() => setShowModal(false)}>
-          <div className="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white" onClick={(e) => e.stopPropagation()}>
+          <div className="relative top-20 mx-auto p-8 border w-11/12 max-w-4xl shadow-2xl rounded-2xl bg-gradient-to-br from-white via-orange-50 to-white border border-orange-100" onClick={(e) => e.stopPropagation()}>
             <div className="mt-3">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent flex items-center">
+                  <CubeIcon className="mr-4 h-8 w-8 text-orange-500" />
                   {editingTank ? 'Editar Tanque' : 'Cadastrar Tanque'}
                 </h2>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 rounded-full hover:bg-gray-100"
                 >
                   <XMarkIcon className="h-6 w-6" />
                 </button>
@@ -420,7 +427,7 @@ const TankRegistration = () => {
                         notes: ''
                       });
                     }}
-                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center"
+                    className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center shadow-md"
                   >
                     <XMarkIcon className="mr-2 h-5 w-5" />
                     Cancelar
@@ -428,7 +435,7 @@ const TankRegistration = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg shadow-md"
                   >
                     <PlusIcon className="mr-2 h-5 w-5" />
                     {loading ? (editingTank ? 'Atualizando...' : 'Cadastrando...') : (editingTank ? 'Atualizar Tanque' : 'Cadastrar Tanque')}

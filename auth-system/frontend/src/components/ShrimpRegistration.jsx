@@ -167,20 +167,25 @@ const ShrimpRegistration = () => {
     <Layout currentPage="shrimp-registration">
       <div className="space-y-8">
         {/* Shrimp List */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-orange-500 flex items-center">
-              <CubeIcon className="mr-3 h-8 w-8 text-orange-500" />
-              Registros de Camarão
-            </h2>
-            <button
-              onClick={() => setShowModal(!showModal)}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center"
-            >
-              <PlusIcon className="mr-2 h-5 w-5" />
-              Cadastrar Camarão
-            </button>
-          </div>
+        <div className="bg-gradient-to-br from-white via-orange-50 to-white p-8 rounded-2xl shadow-xl border border-orange-100 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-orange-200 to-transparent rounded-full opacity-20"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-300 to-transparent rounded-full opacity-15"></div>
+
+          <div className="relative z-10">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent flex items-center">
+                <CubeIcon className="mr-4 h-10 w-10 text-orange-500" />
+                Registros de Camarão
+              </h2>
+              <button
+                onClick={() => setShowModal(!showModal)}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center shadow-md"
+              >
+                <PlusIcon className="mr-2 h-5 w-5" />
+                Cadastrar Camarão
+              </button>
+            </div>
 
           {message && (
             <div className={`mb-4 p-4 rounded-lg ${message.includes('sucesso') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -199,51 +204,55 @@ const ShrimpRegistration = () => {
               <p className="mt-2 text-gray-600">Nenhum registro de camarão cadastrado ainda.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-orange-100">
+              <table className="min-w-full divide-y divide-orange-100">
+                <thead className="bg-gradient-to-r from-orange-50 to-orange-100">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanque</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Camarão</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Início</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias de Vida</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Biometria (g)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sobrevivência (%)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">FCR</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Densidade (ind/m²)</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sanidade</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Tanque</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Tipo de Camarão</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Data Início</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Dias de Vida</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Biometria (g)</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Sobrevivência (%)</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">FCR</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Densidade (ind/m²)</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Sanidade</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-orange-700 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-orange-50">
                   {shrimp.map((item) => (
-                    <tr key={item._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.tankId.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.shrimpType}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(item.startDate).toLocaleDateString('pt-BR')}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.daysOfLife} dias</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.biometria ? `${item.biometria} g` : '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.sobrevivencia ? `${item.sobrevivencia}%` : '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.fcr || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.densidadeEstocagem ? `${item.densidadeEstocagem} ind/m²` : '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.sanidade || '-'}</td>
+                    <tr key={item._id} className="hover:bg-gradient-to-r hover:from-orange-25 hover:to-orange-50 transition-all duration-300 transform hover:scale-[1.01]">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{item.tankId.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.shrimpType}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{new Date(item.startDate).toLocaleDateString('pt-BR')}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.daysOfLife} dias</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.biometria ? `${item.biometria} g` : '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.sobrevivencia ? `${item.sobrevivencia}%` : '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.fcr || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.densidadeEstocagem ? `${item.densidadeEstocagem} ind/m²` : '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.sanidade || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${item.status === 'Ativo' ? 'bg-green-100 text-green-800' : item.status === 'Finalizado' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>
+                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${
+                          item.status === 'Ativo' ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300' :
+                          item.status === 'Finalizado' ? 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300' :
+                          'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300'
+                        }`}>
                           {item.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() => handleEdit(item)}
-                          className="text-indigo-600 hover:text-indigo-900 mr-4 flex items-center"
+                          className="text-blue-600 hover:text-blue-800 mr-4 flex items-center transition-all duration-300 transform hover:scale-110"
                         >
                           <PencilIcon className="mr-1 h-4 w-4" />
                           Editar
                         </button>
                         <button
                           onClick={() => handleDelete(item._id)}
-                          className="text-red-600 hover:text-red-900 flex items-center"
+                          className="text-red-600 hover:text-red-800 flex items-center transition-all duration-300 transform hover:scale-110"
                         >
                           <TrashIcon className="mr-1 h-4 w-4" />
                           Excluir
@@ -255,6 +264,7 @@ const ShrimpRegistration = () => {
               </table>
             </div>
           )}
+          </div>
         </div>
       </div>
 

@@ -86,6 +86,7 @@ const Login = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="current-password"
                   className="appearance-none relative block w-full pl-12 pr-12 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   placeholder="Digite sua senha"
                   value={formData.password}

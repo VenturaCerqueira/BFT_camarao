@@ -129,6 +129,7 @@ const Register = () => {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="new-password"
                   className="appearance-none relative block w-full pl-12 pr-12 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   placeholder="Crie uma senha"
                   value={formData.password}
@@ -167,6 +168,7 @@ const Register = () => {
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   required
+                  autoComplete="new-password"
                   className="appearance-none relative block w-full pl-12 pr-12 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   placeholder="Confirme sua senha"
                   value={formData.confirmPassword}

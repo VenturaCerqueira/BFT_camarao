@@ -36,7 +36,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
+      const response = await axios.post('/.netlify/functions/auth/register', {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -102,16 +102,17 @@ const Register = () => {
                 Email
               </label>
               <div className="relative">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="appearance-none relative block w-full pl-12 pr-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Digite seu email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
+<input
+  id="email"
+  name="email"
+  type="email"
+  autoComplete="email"
+  required
+  className="appearance-none relative block w-full pl-12 pr-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+  placeholder="Digite seu email"
+  value={formData.email}
+  onChange={handleChange}
+/>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

@@ -25,7 +25,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const response = await axios.post('/.netlify/functions/auth/login', formData);
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } catch (error) {
@@ -59,16 +59,17 @@ const Login = () => {
                 Nome de usuário
               </label>
               <div className="relative">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className="appearance-none relative block w-full pl-12 pr-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Digite seu nome de usuário"
-                  value={formData.username}
-                  onChange={handleChange}
-                />
+<input
+  id="username"
+  name="username"
+  type="text"
+  autoComplete="username"
+  required
+  className="appearance-none relative block w-full pl-12 pr-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+  placeholder="Digite seu nome de usuário"
+  value={formData.username}
+  onChange={handleChange}
+/>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

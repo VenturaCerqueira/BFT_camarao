@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     setSuccess('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
+      const response = await axios.post('/.netlify/functions/auth/forgot-password', { email });
       setSuccess('Link de redefinição de senha enviado para seu email!');
     } catch (error) {
       setError(error.response?.data?.message || 'Falha ao enviar email de redefinição');

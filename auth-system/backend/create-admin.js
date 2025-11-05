@@ -4,9 +4,8 @@ const mongoose = require('mongoose');
 
 async function createAdmin() {
   try {
-    // Connect to MongoDB (using in-memory server for development)
-    const mongoServer = await require('mongodb-memory-server').MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    // Connect to MongoDB Atlas
+    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://andersonventuracerqueira1999_db_user:nBAPYDeG8PIyU2D8@bftcamarao.f0yirtj.mongodb.net/?appName=BFTCamarao';
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true

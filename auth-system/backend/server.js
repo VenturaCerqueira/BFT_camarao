@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 dotenv.config();
 
@@ -12,19 +11,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB (in-memory for development)
+// Connect to MongoDB Atlas
 async function connectDB() {
   try {
-    const mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
+    const mongoUri = process.env.MONGO_URI || 'mongodb+srv://andersonventuracerqueira1999_db_user:nBAPYDeG8PIyU2D8@bftcamarao.f0yirtj.mongodb.net/bftcamarao?appName=BFTCamarao';
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    console.log('MongoDB in-memory connected');
+    console.log('MongoDB Atlas connected');
   } catch (err) {
     console.log('MongoDB connection error:', err.message);
-    console.log('Make sure MongoDB is running locally or update MONGO_URI in .env');
   }
 }
 
